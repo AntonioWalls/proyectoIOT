@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import { TAB_ITEMS } from '~/config/tab-items';
+import { BOTTOM_TAB_ROUTES } from './routes'; 
 import TabBar from '~/components/Nav/TabBar';
 
 const Tab = createBottomTabNavigator();
@@ -15,14 +15,14 @@ const TabNavigator = () => {
         headerShown: false,
       }}
     >
-      {TAB_ITEMS.map((item) => (
+      {BOTTOM_TAB_ROUTES.map((route) => (
         <Tab.Screen
-          key={item.name}
-          name={item.name}
-          component={item.component}
+          key={route.name}
+          name={route.name}
+          component={route.component}
           options={{
-            tabBarLabel: item.label,
-            tabBarIcon: item.renderIcon, 
+            tabBarLabel: route.label,
+            tabBarIcon: route.renderIcon,
           }}
         />
       ))}
