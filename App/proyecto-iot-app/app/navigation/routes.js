@@ -2,7 +2,7 @@ import HomeScreen from '~/views/home/HomeScreen';
 import ConfigurationScreen from '~/views/configuration/ConfigurationScreen';
 import { home, more } from '~/config/icons';
 
-export const BOTTOM_TAB_ROUTES = [
+export const TAB_ROUTES = [
   {
     name: 'home',
     component: HomeScreen,
@@ -14,5 +14,12 @@ export const BOTTOM_TAB_ROUTES = [
     component: ConfigurationScreen,
     label: 'Más',
     renderIcon: more,
+  },
+];
+
+export const STACK_ROUTES = [
+  {
+    name: 'ejemplo',
+    component: HomeScreen,
   },
 ];
