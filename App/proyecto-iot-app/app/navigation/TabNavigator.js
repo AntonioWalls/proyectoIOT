@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
-import { BOTTOM_TAB_ROUTES } from './routes'; 
+import { TAB_ROUTES } from './routes'; 
 import TabBar from '~/components/Nav/TabBar';
 
 const Tab = createBottomTabNavigator();
@@ -9,20 +9,20 @@ const Tab = createBottomTabNavigator();
 const TabNavigator = () => {
   return (
     <Tab.Navigator
-      initialRouteName="HomeTab"
+      initialRouteName="home"
       tabBar={(props) => <TabBar {...props} />}
       screenOptions={{
         headerShown: false,
       }}
     >
-      {BOTTOM_TAB_ROUTES.map((route) => (
+      {TAB_ROUTES.map((item) => (
         <Tab.Screen
-          key={route.name}
-          name={route.name}
-          component={route.component}
+          key={item.name}
+          name={item.name}
+          component={item.component}
           options={{
-            tabBarLabel: route.label,
-            tabBarIcon: route.renderIcon,
+            tabBarLabel: item.label,
+            tabBarIcon: item.renderIcon, 
           }}
         />
       ))}
