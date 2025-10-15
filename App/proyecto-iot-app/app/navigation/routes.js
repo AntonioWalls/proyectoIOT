@@ -1,6 +1,9 @@
 import HomeScreen from '~/views/home/HomeScreen';
-import ConfigurationScreen from '~/views/configuration/ConfigurationScreen';
-import { home, more } from '~/config/icons';
+import SettingsScreen from '~/views/settings/SettingsScreen';
+import NotificationsScreen from '~/views/notifications/NotificationsScreen';
+import PondDetailScreen from '~/views/detail/PondDetailScreen';
+import HistoryScreen from '~/views/history/HistoryScreen';
+import { home, more, alert } from '~/config/icons';
 
 export const TAB_ROUTES = [
   {
@@ -10,8 +13,14 @@ export const TAB_ROUTES = [
     renderIcon: home,
   },
   {
+    name: 'alert',
+    component: NotificationsScreen,
+    label: 'Notificaciones',
+    renderIcon: alert,
+  },
+  {
     name: 'configuration',
-    component: ConfigurationScreen,
+    component: SettingsScreen,
     label: 'Más',
     renderIcon: more,
   },
@@ -19,7 +28,11 @@ export const TAB_ROUTES = [
 
 export const STACK_ROUTES = [
   {
-    name: 'ejemplo',
-    component: HomeScreen,
+    name: 'detail',
+    component: PondDetailScreen,
+  },
+  {
+    name: 'history',
+    component: HistoryScreen,
   },
 ];

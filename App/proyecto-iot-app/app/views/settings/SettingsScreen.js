@@ -2,7 +2,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const ConfigurationScreen = () => {
+const SettingsScreen = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Esta es la Pantalla de Configuración</Text>
@@ -21,4 +21,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ConfigurationScreen;
+export default SettingsScreen;
