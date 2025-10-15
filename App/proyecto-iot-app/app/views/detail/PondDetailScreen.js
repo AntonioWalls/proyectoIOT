@@ -1,13 +1,13 @@
 import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 
-const HomeScreen = ({ navigation }) => {
+const PondDetailScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>¡Bienvenido a la Pantalla de Inicio!</Text>
+      <Text style={styles.text}>Pantalla de Detalle de Estanque</Text>
        <Button
-        title="Ir a Detalles"
-        onPress={() => navigation.navigate('detail')}
+        title="Ir a historial"
+        onPress={() => navigation.navigate('history')}
       />
     </View>
   );
@@ -27,4 +27,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default HomeScreen;
+export default PondDetailScreen;
