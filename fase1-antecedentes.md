@@ -1,0 +1,1 @@
+Aquí tenemos algunas referencias sobre investigaciones relacionadas directa o indirectamente con este estudio.
