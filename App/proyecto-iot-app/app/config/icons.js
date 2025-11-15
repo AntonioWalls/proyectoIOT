@@ -46,7 +46,6 @@ export const alertCircle = ({ size = 14, color = '#EF4444', ...props }) => (
   />
 );
 
-// Iconos para las Métricas (de MaterialCommunityIcons)
 export const thermometer = ({ size = 32, color = '#374151', ...props }) => (
   <MaterialCommunityIcons 
     name="thermometer" 
