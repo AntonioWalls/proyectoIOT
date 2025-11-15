@@ -2,52 +2,43 @@ import React from "react";
 import { SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
 import EstanqueCard from "~/ui/components/EstanqueCard";
 
-const HomeScreen = ({ navigation }) => {
-  const estanque1Data = {
+const estanquesData = [
+  {
     id: 1,
     title: "Estanque 1",
     status: "Normal",
     lastUpdate: "hace 2 minutos",
-    collapsedMetrics: [
-      { label: "pH", value: "7.2" },
-      { label: "Temp", value: "28°C" },
-      { label: "OD", value: "6.5 mg/L" },
-      { label: "EC", value: "1500 µS/cm" },
-      { label: "Turbidez", value: "30 NTU" },
+    metrics: [
+      { id: "ph", value: "7.1", level: 0.6 },
+      { id: "temp", value: "28°C", level: 0.5 },
+      { id: "od", value: "6.5 mg/L", level: 0.7 },
+      { id: "ec", value: "1500 µS/cm", level: 0.5 },
+      { id: "turb", value: "30 NTU", level: 0.3 },
     ],
-    expandedMetrics: [
-      {
-        label: "Temperatura",
-        value: "28°C",
-        icon: "thermometer",
-        level: 0.5, // 0.5 = 50% (en rango)
-        color: "#81C784", // Verde
-      },
-      {
-        label: "pH",
-        value: "7.2",
-        icon: "water-percent",
-        level: 0.6,
-        color: "#81C784", // Verde
-      },
-      {
-        label: "Oxígeno Disuelto (OD)",
-        value: "6.5 mg/L",
-        icon: "air-filter",
-        level: 0.7,
-        color: "#81C784", // Verde
-      },
+  },
+  {
+    id: 2,
+    title: "Estanque 2 - Cría",
+    status: "Crítico",
+    lastUpdate: "hace 5 minutos",
+    metrics: [
+      { id: "ph", value: "8.5", level: 0.85 },
+      { id: "temp", value: "32°C", level: 0.9 },
+      { id: "od", value: "4.1 mg/L", level: 0.3 },
     ],
-  };
+  },
+];
 
+const HomeScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.screenHeader}>
           <Text style={styles.screenTitle}>Mis Estanques</Text>
         </View>
-
-        <EstanqueCard data={estanque1Data} />
+        {estanquesData.map((estanque) => (
+          <EstanqueCard key={estanque.id} data={estanque} />
+        ))}
       </ScrollView>
     </SafeAreaView>
   );
@@ -60,6 +51,7 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     paddingHorizontal: 16,
+    paddingBottom: 24,
   },
   screenHeader: {
     paddingTop: 16,
