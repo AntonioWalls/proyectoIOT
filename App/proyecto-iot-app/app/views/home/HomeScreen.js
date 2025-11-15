@@ -1,5 +1,13 @@
 import React from "react";
-import { SafeAreaView, ScrollView, StyleSheet, Text, View } from "react-native";
+import {
+  View,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  Platform,
+  StatusBar,
+} from "react-native";
 import EstanqueCard from "~/ui/components/EstanqueCard";
 
 const estanquesData = [
@@ -37,7 +45,11 @@ const HomeScreen = ({ navigation }) => {
           <Text style={styles.screenTitle}>Mis Estanques</Text>
         </View>
         {estanquesData.map((estanque) => (
-          <EstanqueCard key={estanque.id} data={estanque} />
+          <EstanqueCard
+            key={estanque.id}
+            data={estanque}
+            navigation={navigation}
+          />
         ))}
       </ScrollView>
     </SafeAreaView>
@@ -48,6 +60,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: "#F3F4F6",
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
   scrollContainer: {
     paddingHorizontal: 16,

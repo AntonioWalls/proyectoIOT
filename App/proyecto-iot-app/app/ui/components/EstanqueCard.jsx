@@ -16,7 +16,7 @@ import {
   waterPercent as WaterPercent,
   airFilter as AirFilter,
   flash as Flash,
-} from "~/config/icons"; // Asegúrate que la ruta sea correcta
+} from "~/config/icons";
 
 if (
   Platform.OS === "android" &&
@@ -25,9 +25,6 @@ if (
   UIManager.setLayoutAnimationEnabledExperimental(true);
 }
 
-// --- LÓGICA DE NEGOCIO Y UI ---
-
-// 1. Definimos las propiedades estáticas de cada métrica
 const METRIC_CONFIG = {
   ph: {
     label: "pH",
@@ -52,51 +49,44 @@ const METRIC_CONFIG = {
   turb: {
     label: "Turbidez",
     labelDetailed: "Turbidez",
-    icon: "water-percent", // Puedes cambiar este icono
+    icon: "water-percent",
   },
-  default: { // Un fallback por si llega una métrica desconocida
+  default: {
     label: "Métrica",
     labelDetailed: "Métrica Desconocida",
     icon: "flash",
   },
 };
 
-// 2. Definimos la lógica de color dinámica
 const COLORS = {
-  normal: '#81C784', // Verde
-  warning: '#F59E0B', // Ámbar
-  critical: '#EF4444', // Rojo
+  normal: "#81C784",
+  warning: "#F59E0B",
+  critical: "#EF4444",
 };
 
 const getMetricColor = (id, level) => {
-  // Lógica específica para Oxígeno Disuelto (OD), donde 'bajo' es malo
-  if (id === 'od') {
+  if (id === "od") {
     if (level < 0.4) return COLORS.critical;
     if (level < 0.6) return COLORS.warning;
     return COLORS.normal;
   }
-  
-  // Lógica por defecto (para pH, Temp, etc.) donde 'alto' es malo
+
   if (level > 0.85) return COLORS.critical;
   if (level > 0.7) return COLORS.warning;
   return COLORS.normal;
 };
 
-// 3. Función "Traductora" que une todo
 const getMetricUIProps = (metric) => {
   const config = METRIC_CONFIG[metric.id] || METRIC_CONFIG.default;
   const color = getMetricColor(metric.id, metric.level);
-  
+
   return {
-    ...config, // label, labelDetailed, icon
-    color,     // color dinámico
+    ...config,
+    color,
   };
 };
 
-// ------------------------------------
-
 const StatusBadge = ({ status }) => {
-  // ... (Sin cambios)
   const isNormal = status === "Normal";
   const containerStyle = isNormal ? styles.badgeNormal : styles.badgeCritic;
   const textStyle = isNormal ? styles.badgeTextNormal : styles.badgeTextCritic;
@@ -114,7 +104,6 @@ const StatusBadge = ({ status }) => {
   );
 };
 
-// --- CAMBIO: Ya no se filtra, solo se mapea y "traduce" ---
 const CollapsedView = ({ data }) => (
   <View>
     <View style={styles.header}>
@@ -122,14 +111,11 @@ const CollapsedView = ({ data }) => (
       <StatusBadge status={data.status} />
     </View>
     <View style={styles.metricGrid}>
-      {/* Ya no usamos .filter() */}
       {data.metrics.map((metric) => {
-        // Obtenemos las propiedades de UI
         const uiProps = getMetricUIProps(metric);
         return (
           <View key={metric.id} style={styles.metricItemCollapsed}>
             <Text style={styles.metricLabel}>{uiProps.label}</Text>
-            {/* El valor viene directo de la métrica cruda */}
             <Text style={styles.metricValue}>{metric.value}</Text>
           </View>
         );
@@ -139,7 +125,6 @@ const CollapsedView = ({ data }) => (
 );
 
 const MetricIcon = ({ name, size, color }) => {
-  // ... (Sin cambios)
   switch (name) {
     case "thermometer":
       return <Thermometer size={size} color={color} />;
@@ -154,8 +139,7 @@ const MetricIcon = ({ name, size, color }) => {
   }
 };
 
-// --- CAMBIO: Ya no se filtra, solo se mapea y "traduce" ---
-const ExpandedView = ({ data }) => (
+const ExpandedView = ({ data, navigation }) => (
   <View>
     <View style={styles.header}>
       <Text style={styles.title}>{data.title} - Vista Detallada</Text>
@@ -164,16 +148,31 @@ const ExpandedView = ({ data }) => (
     <Text style={styles.timestamp}>Última actualización {data.lastUpdate}</Text>
 
     <View style={styles.detailedList}>
-      {/* Ya no usamos .filter() */}
       {data.metrics.map((metric) => {
-        // Obtenemos las propiedades de UI
         const uiProps = getMetricUIProps(metric);
+
+        const handleMetricPress = () => {
+          navigation.navigate("history", {
+            estanqueId: data.id,
+            estanqueTitle: data.title,
+            metricId: metric.id,
+            metricLabel: uiProps.labelDetailed,
+          });
+        };
+
         return (
-          <View key={metric.id} style={styles.detailedItem}>
+          <TouchableOpacity
+            key={metric.id}
+            style={styles.detailedItem}
+            activeOpacity={0.7}
+            onPress={handleMetricPress}
+          >
             <View style={styles.detailedItemInfo}>
               <MetricIcon name={uiProps.icon} size={32} color={uiProps.color} />
               <View style={styles.detailedItemText}>
-                <Text style={styles.detailedLabel}>{uiProps.labelDetailed}</Text>
+                <Text style={styles.detailedLabel}>
+                  {uiProps.labelDetailed}
+                </Text>
                 <Text style={styles.detailedValue}>{metric.value}</Text>
               </View>
             </View>
@@ -183,20 +182,19 @@ const ExpandedView = ({ data }) => (
                   styles.progressBar,
                   {
                     width: `${metric.level * 100}%`,
-                    backgroundColor: uiProps.color, // Color dinámico
+                    backgroundColor: uiProps.color,
                   },
                 ]}
               />
             </View>
-          </View>
+          </TouchableOpacity>
         );
       })}
     </View>
   </View>
 );
 
-const EstanqueCard = ({ data }) => {
-  // ... (Sin cambios)
+const EstanqueCard = ({ data, navigation }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleExpand = () => {
@@ -211,7 +209,7 @@ const EstanqueCard = ({ data }) => {
       style={styles.card}
     >
       {isExpanded ? (
-        <ExpandedView data={data} />
+        <ExpandedView data={data} navigation={navigation} /> 
       ) : (
         <CollapsedView data={data} />
       )}
@@ -220,7 +218,6 @@ const EstanqueCard = ({ data }) => {
 };
 
 const styles = StyleSheet.create({
-  // ... (Todos los estilos se quedan exactamente igual)
   card: {
     backgroundColor: "#FFFFFF",
     borderRadius: 16,
