@@ -1,29 +1,79 @@
-import React from 'react';
-import { View, Text, Button, StyleSheet } from 'react-native';
+import React from "react";
+import {
+  View,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  Platform,
+  StatusBar,
+} from "react-native";
+import EstanqueCard from "~/ui/components/EstanqueCard";
+
+const estanquesData = [
+  {
+    id: 1,
+    title: "Estanque 1",
+    status: "Normal",
+    lastUpdate: "hace 2 minutos",
+    metrics: [
+      { id: "ph", value: "7.1", level: 0.6 },
+      { id: "temp", value: "28°C", level: 0.5 },
+      { id: "od", value: "6.5 mg/L", level: 0.7 },
+      { id: "ec", value: "1500 µS/cm", level: 0.5 },
+      { id: "turb", value: "30 NTU", level: 0.3 },
+    ],
+  },
+  {
+    id: 2,
+    title: "Estanque 2 - Cría",
+    status: "Crítico",
+    lastUpdate: "hace 5 minutos",
+    metrics: [
+      { id: "ph", value: "8.5", level: 0.85 },
+      { id: "temp", value: "32°C", level: 0.9 },
+      { id: "od", value: "4.1 mg/L", level: 0.3 },
+    ],
+  },
+];
 
 const HomeScreen = ({ navigation }) => {
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>¡Bienvenido a la Pantalla de Inicio!</Text>
-       <Button
-        title="Ir a Detalles"
-        onPress={() => navigation.navigate('detail')}
-      />
-    </View>
+    <SafeAreaView style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.screenHeader}>
+          <Text style={styles.screenTitle}>Mis Estanques</Text>
+        </View>
+        {estanquesData.map((estanque) => (
+          <EstanqueCard
+            key={estanque.id}
+            data={estanque}
+            navigation={navigation}
+          />
+        ))}
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 16,
+    backgroundColor: "#F3F4F6",
+    paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
-  text: {
-    fontSize: 22,
-    marginBottom: 20,
-    textAlign: 'center',
+  scrollContainer: {
+    paddingHorizontal: 16,
+    paddingBottom: 24,
+  },
+  screenHeader: {
+    paddingTop: 16,
+    paddingBottom: 8,
+  },
+  screenTitle: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#111827",
   },
 });
 
