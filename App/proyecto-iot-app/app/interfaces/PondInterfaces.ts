@@ -1,26 +1,20 @@
+export interface Metric {
+  id: string;
+  value: number | string; 
+  level: number;
+}
 
 export interface PondDevice {
-  id: string;
-  displayName: string;
-  etag: string;
-  enabled: boolean;
-  template: string;
-  simulated: boolean;
-  provisioned: boolean;
+  id: string | number;
+  title: string;
+  status: string;
+  lastUpdate: any | string; 
+  metrics: Metric[];
 }
 
-export interface AllPondsResponse {
-  value: PondDevice[];
-}
-
-export interface PondTelemetry {
-  Temperature?: { value: number; timestamp: string };
-  Conductivity?: { value: number; timestamp: string };
-  Turbidity?: { value: number; timestamp: string };
-  Salinity?: { value: number; timestamp: string };
-  AcidityPH?: { value: number; timestamp: string };
-}
-
-export interface TelemetryResponse {
-  results: PondTelemetry;
+export interface HistoryRecord {
+  pondId: string;
+  metric: string;
+  value: number;
+  timestamp: any;
 }
