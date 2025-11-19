@@ -1,54 +1,48 @@
-import React, { useState, useEffect } from 'react'; // CAMBIO 1: Importar hooks
+import React, { useState, useEffect } from 'react';
 import { 
   SafeAreaView, 
-  View,
+  View, 
   Text, 
   StyleSheet, 
-  TouchableOpacity,
-  Platform,
-  StatusBar,
-  ScrollView,
+  TouchableOpacity, 
+  Platform, 
+  StatusBar, 
   ActivityIndicator,
 } from 'react-native';
 import MetricGraph from '~/ui/components/MetricGraph';
-// import { useMetricHistory } from '~/hooks/useMetricHistory'; 
+import { useEstanques } from '~/hooks/useEstanques'; 
 
-const generateMockHistory = (metricId) => {
-  console.log(`Simulando datos para: ${metricId}`);
-  let baseValue = 7.0; 
-  
-  if (metricId === 'temp') {
-    baseValue = 28.0; 
-  } else if (metricId === 'od') {
-    baseValue = 6.5; 
-  }
-
-  return Array.from({ length: 20 }, (_, i) => {
-    const value = parseFloat((baseValue + (Math.random() - 0.5) * 0.2).toFixed(2));
-    const time = `1${i < 10 ? '0' + i : i}:00`; 
-    return {
-      id: i, 
-      timestamp: `Hoy ${time}`,
-      value: value,
-    };
-  }).reverse(); 
+const formatGraphTime = (timestamp) => {
+  if (!timestamp || !timestamp._seconds) return "";
+  const date = new Date(timestamp._seconds * 1000);
+  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 };
-// --------------------------------------------------
 
 const HistoryScreen = ({ route, navigation }) => {
   const { estanqueId, estanqueTitle, metricId, metricLabel } = route.params;
 
+  const { getPondHistory } = useEstanques(false);
+  
   const [isLoading, setIsLoading] = useState(true);
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      const simulatedData = generateMockHistory(metricId);
-      setData(simulatedData);
+    const fetchData = async () => {
+      setIsLoading(true);
+      const apiData = await getPondHistory(estanqueId, metricId);
+      
+      const formattedData = apiData.map(item => ({
+        id: item.timestamp._seconds, 
+        value: item.value,
+        label: formatGraphTime(item.timestamp), 
+      }));
+
+      setData(formattedData);
       setIsLoading(false);
-    }, 1500);
-    return () => clearTimeout(timer);
-  }, [metricId]);
+    };
+
+    fetchData();
+  }, [estanqueId, metricId]); 
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -64,21 +58,19 @@ const HistoryScreen = ({ route, navigation }) => {
         <Text style={styles.title}>{metricLabel}</Text>
         <Text style={styles.subtitle}>{estanqueTitle}</Text>
         
-        {/* --- CAMBIO 3: Renderizado de la Gráfica --- */}
         <View style={styles.graphContainer}>
           {isLoading ? (
-            // Usamos un indicador de carga nativo
             <ActivityIndicator size="large" color="#007AFF" />
           ) : (
-            // ¡Mostramos nuestro componente de gráfica!
             <MetricGraph data={data} />
           )}
         </View>
-        {/* ------------------------------------------- */}
         
-        <Text style={styles.debugInfo}>
-          Debug: estanqueId={estanqueId}, metricId={metricId}
-        </Text>
+        {!isLoading && data.length > 0 && (
+          <Text style={styles.debugInfo}>
+            Último registro: {data[0].value} a las {data[0].label}
+          </Text>
+        )}
       </View>
     </SafeAreaView>
   );
@@ -113,14 +105,12 @@ const styles = StyleSheet.create({
     color: '#6B7280',
     marginBottom: 24,
   },
-  // CAMBIO 4: Ajustamos el contenedor
   graphContainer: {
     height: 300,
     backgroundColor: '#FFFFFF',
     borderRadius: 16,
-    justifyContent: 'center', // Centra el ActivityIndicator
+    justifyContent: 'center', 
     alignItems: 'center',
-    // Ya no necesitamos padding, la gráfica lo maneja
   },
   debugInfo: {
     marginTop: 20,
@@ -128,7 +118,6 @@ const styles = StyleSheet.create({
     color: '#9CA3AF',
     textAlign: 'center',
   }
-  // (Ya no necesitamos dataScrollView, graphTitle, dataPoint)
 });
 
 export default HistoryScreen;
