@@ -84,7 +84,7 @@ export const useEstanques = (autoLoad: boolean = true) => {
     try {
       const historyData = (await api.get<HistoryRecord[]>("/getHistory", {
         params: {
-          pondId: pondId,
+          pondId: "pond1",
           metric: metricId,
         },
       })) as unknown as HistoryRecord[];

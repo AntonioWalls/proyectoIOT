@@ -7,16 +7,14 @@ import {
   Platform,
   StatusBar,
   View,
-  ActivityIndicator // Importamos el indicador de carga
+  ActivityIndicator 
 } from "react-native";
 import EstanqueCard from "~/ui/components/EstanqueCard";
-import { useEstanques } from "~/hooks/useEstanques"; // Asegúrate de la ruta correcta
+import { useEstanques } from "~/hooks/useEstanques"; 
 
 const HomeScreen = ({ navigation }) => {
-  // Usamos el hook
   const { estanques, loading, error } = useEstanques();
 
-  // Vista de Carga
   if (loading) {
     return (
       <SafeAreaView style={[styles.container, styles.centerContent]}>
@@ -26,7 +24,6 @@ const HomeScreen = ({ navigation }) => {
     );
   }
 
-  // Vista de Error (Opcional pero recomendada)
   if (error) {
     return (
       <SafeAreaView style={[styles.container, styles.centerContent]}>
@@ -35,7 +32,6 @@ const HomeScreen = ({ navigation }) => {
     );
   }
 
-  // Vista Principal con Datos
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
@@ -43,14 +39,11 @@ const HomeScreen = ({ navigation }) => {
           <Text style={styles.screenTitle}>Mis Estanques</Text>
         </View>
         
-        {/* Mapeamos los datos REALES del hook */}
         {estanques.map((estanque) => (
           <EstanqueCard
             key={estanque.id}
             data={estanque}
-            // Como EstanqueCard usa useNavigation internamente,
-            // técnicamente ya no es obligatorio pasar 'navigation',
-            // pero no hace daño dejarlo si no has quitado la prop.
+            navigation={navigation}
           />
         ))}
       </ScrollView>
@@ -64,7 +57,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#F3F4F6",
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
   },
-  // Estilo extra para centrar el loader
   centerContent: {
     justifyContent: 'center',
     alignItems: 'center',
