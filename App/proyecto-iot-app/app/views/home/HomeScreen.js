@@ -1,54 +1,56 @@
 import React from "react";
 import {
-  View,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   Platform,
   StatusBar,
+  View,
+  ActivityIndicator // Importamos el indicador de carga
 } from "react-native";
 import EstanqueCard from "~/ui/components/EstanqueCard";
-
-const estanquesData = [
-  {
-    id: 1,
-    title: "Estanque 1",
-    status: "Normal",
-    lastUpdate: "hace 2 minutos",
-    metrics: [
-      { id: "ph", value: "7.1", level: 0.6 },
-      { id: "temp", value: "28°C", level: 0.5 },
-      { id: "od", value: "6.5 mg/L", level: 0.7 },
-      { id: "ec", value: "1500 µS/cm", level: 0.5 },
-      { id: "turb", value: "30 NTU", level: 0.3 },
-    ],
-  },
-  {
-    id: 2,
-    title: "Estanque 2 - Cría",
-    status: "Crítico",
-    lastUpdate: "hace 5 minutos",
-    metrics: [
-      { id: "ph", value: "8.5", level: 0.85 },
-      { id: "temp", value: "32°C", level: 0.9 },
-      { id: "od", value: "4.1 mg/L", level: 0.3 },
-    ],
-  },
-];
+import { useEstanques } from "~/hooks/useEstanques"; // Asegúrate de la ruta correcta
 
 const HomeScreen = ({ navigation }) => {
+  // Usamos el hook
+  const { estanques, loading, error } = useEstanques();
+
+  // Vista de Carga
+  if (loading) {
+    return (
+      <SafeAreaView style={[styles.container, styles.centerContent]}>
+        <ActivityIndicator size="large" color="#007AFF" />
+        <Text style={{ marginTop: 10, color: '#6B7280' }}>Cargando estanques...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  // Vista de Error (Opcional pero recomendada)
+  if (error) {
+    return (
+      <SafeAreaView style={[styles.container, styles.centerContent]}>
+        <Text style={{ color: '#EF4444', fontSize: 16 }}>{error}</Text>
+      </SafeAreaView>
+    );
+  }
+
+  // Vista Principal con Datos
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         <View style={styles.screenHeader}>
           <Text style={styles.screenTitle}>Mis Estanques</Text>
         </View>
-        {estanquesData.map((estanque) => (
+        
+        {/* Mapeamos los datos REALES del hook */}
+        {estanques.map((estanque) => (
           <EstanqueCard
             key={estanque.id}
             data={estanque}
-            navigation={navigation}
+            // Como EstanqueCard usa useNavigation internamente,
+            // técnicamente ya no es obligatorio pasar 'navigation',
+            // pero no hace daño dejarlo si no has quitado la prop.
           />
         ))}
       </ScrollView>
@@ -61,6 +63,11 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: "#F3F4F6",
     paddingTop: Platform.OS === "android" ? StatusBar.currentHeight : 0,
+  },
+  // Estilo extra para centrar el loader
+  centerContent: {
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   scrollContainer: {
     paddingHorizontal: 16,

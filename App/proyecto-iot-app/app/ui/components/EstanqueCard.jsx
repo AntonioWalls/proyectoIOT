@@ -11,11 +11,12 @@ import {
 
 import {
   checkCircle as CheckCircle,
-  alertCircle as AlertCircle,
+  alertCircle as AlertCircle, 
   thermometer as Thermometer,
   waterPercent as WaterPercent,
   airFilter as AirFilter,
   flash as Flash,
+  alert as AlertTriangle, 
 } from "~/config/icons";
 
 if (
@@ -26,53 +27,31 @@ if (
 }
 
 const METRIC_CONFIG = {
-  ph: {
-    label: "pH",
-    labelDetailed: "pH",
-    icon: "water-percent",
-  },
-  temp: {
-    label: "Temp",
-    labelDetailed: "Temperatura",
-    icon: "thermometer",
-  },
-  od: {
-    label: "OD",
-    labelDetailed: "Oxígeno Disuelto (OD)",
-    icon: "air-filter",
-  },
-  ec: {
-    label: "EC",
-    labelDetailed: "Conductividad (EC)",
-    icon: "flash",
-  },
-  turb: {
-    label: "Turbidez",
-    labelDetailed: "Turbidez",
-    icon: "water-percent",
-  },
-  default: {
-    label: "Métrica",
-    labelDetailed: "Métrica Desconocida",
-    icon: "flash",
-  },
+  ph: { label: "pH", labelDetailed: "pH", icon: "water-percent" },
+  temp: { label: "Temp", labelDetailed: "Temperatura", icon: "thermometer" },
+  od: { label: "OD", labelDetailed: "Oxígeno Disuelto (OD)", icon: "air-filter" },
+  ec: { label: "EC", labelDetailed: "Conductividad (EC)", icon: "flash" },
+  turb: { label: "Turbidez", labelDetailed: "Turbidez", icon: "water-percent" },
+  default: { label: "Métrica", labelDetailed: "Métrica", icon: "flash" },
 };
 
 const COLORS = {
-  normal: "#81C784",
-  warning: "#F59E0B",
-  critical: "#EF4444",
+  normal: "#10B981",    
+  warning: "#F59E0B",   
+  critical: "#EF4444",  
+  bgNormal: "#E0F2F1",  
+  bgWarning: "#FEF3C7", 
+  bgCritical: "#FEE2E2",
 };
 
-const getMetricColor = (id, level) => {
-  if (id === "od") {
-    if (level < 0.4) return COLORS.critical;
-    if (level < 0.6) return COLORS.warning;
-    return COLORS.normal;
-  }
 
-  if (level > 0.85) return COLORS.critical;
-  if (level > 0.7) return COLORS.warning;
+const UMBRAL_CRITICO = 0.85;
+const UMBRAL_ADVERTENCIA = 0.60;
+
+const getMetricColor = (id, level) => {
+  
+  if (level > UMBRAL_CRITICO) return COLORS.critical;
+  if (level > UMBRAL_ADVERTENCIA) return COLORS.warning;
   return COLORS.normal;
 };
 
@@ -80,26 +59,42 @@ const getMetricUIProps = (metric) => {
   const config = METRIC_CONFIG[metric.id] || METRIC_CONFIG.default;
   const color = getMetricColor(metric.id, metric.level);
 
-  return {
-    ...config,
-    color,
-  };
+  return { ...config, color };
 };
 
 const StatusBadge = ({ status }) => {
-  const isNormal = status === "Normal";
-  const containerStyle = isNormal ? styles.badgeNormal : styles.badgeCritic;
-  const textStyle = isNormal ? styles.badgeTextNormal : styles.badgeTextCritic;
-  const iconColor = isNormal ? "#10B981" : "#EF4444";
+  let containerStyle, textStyle, iconColor, IconComponent;
+
+  switch (status) {
+    case "Normal":
+      containerStyle = { backgroundColor: COLORS.bgNormal };
+      textStyle = { color: COLORS.normal };
+      iconColor = COLORS.normal;
+      IconComponent = CheckCircle;
+      break;
+    case "Advertencia":
+      containerStyle = { backgroundColor: COLORS.bgWarning };
+      textStyle = { color: COLORS.warning };
+      iconColor = COLORS.warning;
+      IconComponent = AlertTriangle || AlertCircle; 
+      break;
+    case "Crítico":
+      containerStyle = { backgroundColor: COLORS.bgCritical };
+      textStyle = { color: COLORS.critical };
+      iconColor = COLORS.critical;
+      IconComponent = AlertCircle;
+      break;
+    default: 
+      containerStyle = { backgroundColor: "#F3F4F6" };
+      textStyle = { color: "#6B7280" };
+      iconColor = "#6B7280";
+      IconComponent = CheckCircle;
+  }
 
   return (
     <View style={[styles.badgeContainer, containerStyle]}>
-      {isNormal ? (
-        <CheckCircle size={14} color={iconColor} style={{ marginRight: 4 }} />
-      ) : (
-        <AlertCircle size={14} color={iconColor} style={{ marginRight: 4 }} />
-      )}
-      <Text style={textStyle}>{status}</Text>
+      <IconComponent size={14} color={iconColor} style={{ marginRight: 4 }} />
+      <Text style={[styles.badgeText, textStyle]}>{status}</Text>
     </View>
   );
 };
@@ -126,16 +121,11 @@ const CollapsedView = ({ data }) => (
 
 const MetricIcon = ({ name, size, color }) => {
   switch (name) {
-    case "thermometer":
-      return <Thermometer size={size} color={color} />;
-    case "water-percent":
-      return <WaterPercent size={size} color={color} />;
-    case "air-filter":
-      return <AirFilter size={size} color={color} />;
-    case "flash":
-      return <Flash size={size} color={color} />;
-    default:
-      return <Thermometer size={size} color={color} />;
+    case "thermometer": return <Thermometer size={size} color={color} />;
+    case "water-percent": return <WaterPercent size={size} color={color} />;
+    case "air-filter": return <AirFilter size={size} color={color} />;
+    case "flash": return <Flash size={size} color={color} />;
+    default: return <Thermometer size={size} color={color} />;
   }
 };
 
@@ -170,9 +160,7 @@ const ExpandedView = ({ data, navigation }) => (
             <View style={styles.detailedItemInfo}>
               <MetricIcon name={uiProps.icon} size={32} color={uiProps.color} />
               <View style={styles.detailedItemText}>
-                <Text style={styles.detailedLabel}>
-                  {uiProps.labelDetailed}
-                </Text>
+                <Text style={styles.detailedLabel}>{uiProps.labelDetailed}</Text>
                 <Text style={styles.detailedValue}>{metric.value}</Text>
               </View>
             </View>
@@ -181,7 +169,7 @@ const ExpandedView = ({ data, navigation }) => (
                 style={[
                   styles.progressBar,
                   {
-                    width: `${metric.level * 100}%`,
+                    width: `${Math.min(metric.level * 100, 100)}%`,
                     backgroundColor: uiProps.color,
                   },
                 ]}
@@ -247,7 +235,6 @@ const styles = StyleSheet.create({
     color: "#6B7280",
     marginBottom: 16,
   },
-
   badgeContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -255,23 +242,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 12,
   },
-  badgeNormal: {
-    backgroundColor: "#E0F2F1",
-  },
-  badgeCritic: {
-    backgroundColor: "#FEE2E2",
-  },
-  badgeTextNormal: {
-    color: "#10B981",
+  badgeText: {
     fontSize: 12,
     fontWeight: "600",
   },
-  badgeTextCritic: {
-    color: "#EF4444",
-    fontSize: 12,
-    fontWeight: "600",
-  },
-
   metricGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -291,7 +265,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     color: "#1F2937",
   },
-
   detailedList: {
     marginTop: 8,
   },
@@ -318,7 +291,6 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "#1F2937",
   },
-
   progressBarContainer: {
     height: 8,
     backgroundColor: "#E5E7EB",
